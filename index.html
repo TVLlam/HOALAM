@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💌 Gửi Em Yêu 💌</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Global Styles --- */
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(to right top, #FFC0CB, #FFDAB9, #ADD8E6); /* Soft, cute gradient */
+            font-family: 'Quicksand', sans-serif;
+            color: #4a4a4a;
+            overflow: hidden; /* Hide scrollbars for effects */
+            position: relative;
+            cursor: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJyZWQiIGQ9Ik0xMiAxLjIxN2MtMi4wOTUgMi44NTEtNCA1LjIxNy00IDcuMjgzYzAgMi43NiAyLjIzOSA1IDUuNiAyLjg1Mi0zLjcxNS02LjA2Ni0zLjE1OC03LjI4MyAwLTUuNDI5IDAtOSA0LjA4NC05IDkuNjczczItMi44NTItNC03.MjgzYzAtMi43Ni0yLjIzOS01LTUuMS01di0xMy41ODIiLz48L3N2Z34=') , auto; /* Cute heart cursor */
+        }
+
+        /* --- Main Card Container --- */
+        #main-card {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 50px 70px;
+            border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 600px;
+            position: relative;
+            z-index: 10;
+            animation: fadeInScale 1.5s ease-out forwards;
+            backdrop-filter: blur(8px); /* Frosted glass effect */
+        }
+
+        /* --- Question Text --- */
+        #question-text {
+            font-family: 'Pacifico', cursive;
+            color: #FF69B4; /* Hot pink */
+            font-size: 3.5em;
+            margin-bottom: 40px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+            line-height: 1.2;
+            min-height: 1.2em; /* Ensure height for dynamic text */
+        }
+
+        /* --- Buttons Container --- */
+        #buttons-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+            position: relative; /* For "No" button movement */
+        }
+
+        /* --- Button Base Style --- */
+        .btn {
+            background-color: #FF69B4; /* Hot pink */
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.5em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: relative; /* For z-index and animations */
+        }
+
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* --- Specific Button Styles --- */
+        #yes-btn {
+            background-color: #7FFF00; /* Green for Yes */
+        }
+        #yes-btn:hover {
+            background-color: #6ed100;
+        }
+
+        #no-btn {
+            background-color: #FF4500; /* Orange-red for No */
+            z-index: 20; /* Ensure it's above other elements for movement */
+        }
+        #no-btn:hover {
+            background-color: #e63e00;
+        }
+
+        /* --- Success Message Style --- */
+        #success-message {
+            display: none;
+            font-family: 'Pacifico', cursive;
+            color: #FF69B4;
+            font-size: 3.5em;
+            margin-top: 40px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+            line-height: 1.2;
+        }
+
+        /* --- Floating Elements (Hearts & Text) --- */
+        .floating-element {
+            position: absolute;
+            opacity: 0;
+            animation: floatUpAndFade var(--animation-duration) ease-out forwards infinite;
+            pointer-events: none;
+            z-index: 1;
+            text-shadow: 0 0 5px rgba(255, 105, 180, 0.5);
+            bottom: -50px; /* Start from below viewport */
+            white-space: nowrap; /* Prevent text wrapping */
+        }
+        .floating-element.heart {
+            font-size: 2em;
+            color: red;
+        }
+        .floating-element.text {
+            font-size: 1.2em; /* Default text size */
+            font-weight: bold;
+            color: #FF69B4; /* Default text color */
+        }
+
+        /* --- Confetti Effect (for Yes) --- */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: var(--color);
+            border-radius: 50%;
+            opacity: 0;
+            animation: confettiFall 2s ease-out forwards;
+            pointer-events: none;
+            z-index: 15;
+        }
+
+        /* --- Music Control for audio tag --- */
+        #music-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            transition: background-color 0.3s;
+        }
+        #music-control:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        #music-control span {
+            font-size: 1.8em;
+            color: #FF69B4;
+        }
+
+        /* --- Keyframe Animations --- */
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes floatUpAndFade {
+            0% { transform: translateY(0) translateX(var(--random-x)); opacity: 0; }
+            20% { opacity: 0.8; }
+            80% { opacity: 0.3; }
+            100% { transform: translateY(-120vh) translateX(calc(var(--random-x) + var(--drift-x))); opacity: 0; }
+        }
+
+        @keyframes confettiFall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(500px) rotate(720deg); opacity: 0; }
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 768px) {
+            #main-card {
+                padding: 40px 30px;
+                margin: 20px;
+            }
+            #question-text {
+                font-size: 2.5em;
+            }
+            .btn {
+                font-size: 1.2em;
+                padding: 12px 30px;
+            }
+            #success-message {
+                font-size: 2.5em;
+            }
+            #buttons-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #main-card {
+                padding: 30px 20px;
+            }
+            #question-text {
+                font-size: 2em;
+            }
+            .btn {
+                font-size: 1em;
+                padding: 10px 25px;
+            }
+            #success-message {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="background-music" loop autoplay muted>
+        <source src="nhac.mp3" type="audio/mpeg">
+        Trình duyệt của bạn không hỗ trợ phần tử audio.
+    </audio>
+    
+    <div id="main-card">
+        <p id="question-text">Anh muốn tỏ tình em! ❤️</p>
+        <div id="buttons-container">
+            <button class="btn" id="yes-btn" onclick="handleYes()">Em đồng ý! 🥰</button>
+            <button class="btn" id="no-btn" onclick="handleNo()">Em không đồng ý 😔</button>
+        </div>
+        <p id="success-message">Yay! Anh biết mà! 😍 Anh cũng yêu em rất nhiều!</p>
+    </div>
+
+    <div id="music-control">
+        <span id="play-pause-icon">🔇</span>
+    </div>
+
+    <script>
+        const playPauseIcon = document.getElementById('play-pause-icon');
+        const noButton = document.getElementById('no-btn');
+        const questionText = document.getElementById('question-text');
+        const buttonsContainer = document.getElementById('buttons-container');
+        const successMessage = document.getElementById('success-message');
+        const mainCard = document.getElementById('main-card');
+        const body = document.body;
+
+        // Biến cho thẻ audio
+        const backgroundMusic = document.getElementById('background-music');
+        let isMuted = true; // Ban đầu là tắt tiếng
+
+        // Biến cờ để kiểm soát việc bật nhạc lần đầu
+        let firstInteractionDone = false;
+
+        let noClickCount = 0;
+        const noMessages = [
+            "Đừng mà em! Cho anh một cơ hội đi... 🥺",
+            "Thiệt luôn hả? Anh buồn lắm đó!💔",
+            "Năn nỉ đó em, bấm 'Em đồng ý' đi mà... 🙏",
+            "Không phải lúc để đùa đâu! Bấm 'Em đồng ý' đi! ✨",
+            "Em biết anh thương em mà, phải không? 😊",
+            "Thôi mà, nghĩ lại đi em... Pleaseee! 🐶",
+            "Chỉ có một câu trả lời đúng thôi đó! Là 'Em đồng ý' đó! 😉",
+            "Trái tim anh đang tan nát rồi nè... Bấm 'Em đồng ý' đi nha! 😭",
+            "Không thể nào! Chắc chắn có nhầm lẫn rồi! Bấm 'Em đồng ý' lại đi nè! 🥰",
+            "Anh biết em yêu anh mà, đúng không? Đừng chối mà! 🥰",
+            "Cái nút 'Em không đồng ý' này có vẻ không hoạt động đâu... thử lại nút 'Em đồng ý' đi! 😉"
+        ];
+        const floatingTexts = [
+            "Em à...", "Anh sai rồi...", "Anh xin lỗi...", "Anh hứa...",
+            "Tha lỗi cho em...", "Baby à...", "Bé à...", "Yêu em...",
+            "Anh nhớ em...", "Đừng giận anh nữa mà...", "Anh sẽ thay đổi...",
+            "Mãi yêu em...", "Em là tất cả...", "Không có em, anh không thể...",
+            "Xin em...",
+            "Anh yêu Hoa", "Lâm yêu Hoa mà", "mãi yêu VQH",
+        ];
+        const heartEmojis = ['❤️', '💖', '✨', '💕', '💞', '💜', '💛', '💚', '💙'];
+
+        // --- Hàm để bật tiếng và phát nhạc ---
+        function unmuteAndPlay() {
+            if (backgroundMusic) { // Đảm bảo thẻ audio tồn tại
+                if (isMuted) {
+                    backgroundMusic.muted = false; // Bỏ tắt tiếng
+                    backgroundMusic.play(); // Bắt đầu phát (hoặc tiếp tục phát nếu đang tạm dừng)
+                    playPauseIcon.textContent = '🔊'; // Đổi icon loa có tiếng
+                    isMuted = false;
+                } else {
+                    backgroundMusic.muted = true; // Tắt tiếng
+                    // backgroundMusic.pause(); // Có thể pause nếu muốn, nhưng thường thì chỉ mute thôi
+                    playPauseIcon.textContent = '🔇'; // Đổi icon loa tắt tiếng
+                    isMuted = true;
+                }
+            }
+        }
+
+        // --- Music Control for <audio> tag ---
+        document.getElementById('music-control').addEventListener('click', (event) => {
+            event.stopPropagation(); // Ngăn sự kiện click lan truyền ra body
+            unmuteAndPlay(); // Gọi hàm bật/tắt tiếng và phát
+            firstInteractionDone = true;
+        });
+
+        // --- Xử lý click bất cứ đâu trên body để kích hoạt nhạc lần đầu (tăng khả năng nghe được) ---
+        document.body.addEventListener('click', () => {
+            if (!firstInteractionDone) {
+                unmuteAndPlay();
+                firstInteractionDone = true;
+            }
+        }, { once: true }); // Dùng { once: true } để chỉ lắng nghe 1 lần
+
+
+        // --- "No" Button Logic (ĐÃ CHỈNH SỬA - KHÔNG CÒN CHẠY LUNG TUNG) ---
+        function handleNo() {
+            // Thay đổi tin nhắn
+            questionText.textContent = noMessages[noClickCount % noMessages.length];
+            noClickCount++;
+
+            // Các dòng code di chuyển và thay đổi kích thước đã được loại bỏ
+
+            // Để nút "Không" luôn hiển thị bình thường tại vị trí của nó
+            noButton.style.position = 'static'; // Đặt lại về vị trí bình thường
+            noButton.style.left = ''; // Xóa thuộc tính left
+            noButton.style.top = ''; // Xóa thuộc tính top
+            noButton.style.transform = ''; // Xóa thuộc tính transform (kích thước)
+            noButton.style.transition = ''; // Xóa hiệu ứng chuyển động
+        }
+
+        // --- "Yes" Button Logic ---
+        function handleYes() {
+            // Ẩn câu hỏi và các nút
+            questionText.style.display = 'none';
+            buttonsContainer.style.display = 'none';
+
+            // Hiển thị tin nhắn thành công
+            successMessage.style.display = 'block';
+
+            // Kích hoạt pháo hoa và trái tim bùng nổ
+            createConfetti();
+            createHeartBurst();
+
+            // Bật tiếng nhạc nếu nó đang tắt
+            if (backgroundMusic) {
+                backgroundMusic.muted = false; // Đảm bảo bỏ tắt tiếng
+                backgroundMusic.play(); // Đảm bảo nhạc đang phát
+                playPauseIcon.textContent = '🔊'; // Cập nhật icon
+                isMuted = false;
+            }
+            firstInteractionDone = true; // Đánh dấu đã có tương tác
+
+            // Tắt nút "Không" hoàn toàn
+            noButton.onclick = null;
+            noButton.onmouseover = null;
+        }
+
+        // --- Floating Elements Functions ---
+        function createFloatingElement() {
+            const element = document.createElement('span');
+            const isHeart = Math.random() < 0.4;
+            const duration = Math.random() * 5 + 8;
+
+            element.style.setProperty('--animation-duration', `${duration}s`);
+
+            if (isHeart) {
+                element.classList.add('floating-element', 'heart');
+                element.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+                element.style.fontSize = `${Math.random() * 1.5 + 1.8}em`;
+            } else {
+                element.classList.add('floating-element', 'text');
+                element.textContent = floatingTexts[Math.floor(Math.random() * floatingTexts.length)];
+                element.style.fontSize = `${Math.random() * 0.7 + 1.0}em`;
+                element.style.color = `hsl(${Math.random() * 360}, 80%, 75%)`;
+            }
+
+            element.style.left = `${Math.random() * 100}vw`;
+            element.style.animationDelay = `${Math.random() * 3}s`;
+            element.style.setProperty('--random-x', `${(Math.random() - 0.5) * 200}px`);
+            element.style.setProperty('--drift-x', `${(Math.random() - 0.5) * 100}px`);
+
+            body.appendChild(element);
+
+            element.addEventListener('animationend', () => {
+                element.remove();
+            });
+        }
+
+        // --- Confetti & Heart Burst Functions ---
+        function createHeartBurst() {
+            for (let i = 0; i < 50; i++) {
+                const heart = document.createElement('span');
+                heart.classList.add('floating-element', 'heart');
+                heart.textContent = '💖';
+                heart.style.left = `calc(50% + ${Math.random() * 200 - 100}px)`;
+                heart.style.top = `calc(50% + ${Math.random() * 200 - 100}px)`;
+                heart.style.animation = `floatUpAndFade 2s ease-out forwards`;
+                heart.style.animationDelay = `${Math.random() * 0.5}s`;
+                heart.style.fontSize = `${Math.random() * 2 + 1.5}em`;
+                heart.style.setProperty('--random-x', `${(Math.random() - 0.5) * 600}px`);
+                heart.style.setProperty('--drift-x', `${(Math.random() - 0.5) * 300}px`);
+                body.appendChild(heart);
+                heart.addEventListener('animationend', () => heart.remove());
+            }
+        }
+
+        function createConfetti() {
+            const colors = ['#FFC0CB', '#FFD700', '#ADD8E6', '#98FB98', '#FFA07A'];
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.setProperty('--color', colors[Math.floor(Math.random() * colors.length)]);
+                confetti.style.left = `${Math.random() * 100}vw`;
+            
+            confetti.style.top = `${Math.random() * 20}vh`;
+            confetti.style.animationDelay = `${Math.random() * 0.5}s`;
+            body.appendChild(confetti);
+            confetti.addEventListener('animationend', () => confetti.remove());
+        }
+    }
+
+    // Kích hoạt tạo các phần tử bay lên ngay khi DOM tải xong
+    document.addEventListener('DOMContentLoaded', () => {
+        setInterval(createFloatingElement, 500);
+    });
+    </script>
+</body>
+</html>
